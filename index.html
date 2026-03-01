@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Empaquetadores</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #1e293b;
+            --text: #f8fafc;
+            --border: #475569;
+            --cell-bg: #334155;
+            --btn-red: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h2 { 
+            margin: 10px 0; 
+            color: var(--primary); 
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-container {
+            flex-grow: 1;
+            width: 98%;
+            height: 80%;
+            overflow-x: auto; /* Permite el deslizamiento horizontal si es necesario */
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 700px; /* Asegura que las columnas no se aplasten demasiado */
+            height: 100%;
+            table-layout: fixed;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            text-align: center;
+            font-size: 0.75rem;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: white;
+            padding: 8px 2px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 2px;
+            background-color: #243147;
+        }
+
+        .name-input {
+            text-align: left;
+            padding: 5px;
+            font-weight: bold;
+            color: #fff;
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+        }
+
+        .total-cell {
+            font-weight: bold;
+            color: #60a5fa;
+            font-size: 0.9rem;
+            background-color: #1e293b;
+        }
+
+        .btn-plus {
+            background-color: transparent;
+            color: var(--text);
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+            min-height: 40px;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .count-text {
+            color: #fbbf24; /* Color naranja/amarillo para resaltar el número */
+            font-weight: bold;
+            font-size: 1rem;
+            display: block;
+            width: 100%;
+            height: 100%;
+            line-height: 40px;
+            cursor: pointer;
+        }
+
+        .btn-reset {
+            background-color: var(--btn-red);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>📦 Registro de Empaquetadores</h2>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 120px;">Nombre</th>
+                    <th>Lunes</th>
+                    <th>Martes</th>
+                    <th>Miércoles</th>
+                    <th>Jueves</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                    <th style="width: 60px;">Total</th>
+                </tr>
+            </thead>
+            <tbody id="cuerpoTabla"></tbody>
+        </table>
+    </div>
+
+    <button class="btn-reset" onclick="limpiarTabla()">Limpiar Todo</button>
+
+    <script>
+        const numFilas = 9;
+        const cuerpoTabla = document.getElementById('cuerpoTabla');
+
+        for (let i = 0; i < numFilas; i++) {
+            const tr = document.createElement('tr');
+            
+            // Nombre
+            const tdNombre = document.createElement('td');
+            tdNombre.innerHTML = `<input type="text" class="name-input" placeholder="Empleado ${i+1}">`;
+            tr.appendChild(tdNombre);
+            
+            // Lunes a Domingo (7 días)
+            for (let j = 0; j < 7; j++) {
+                const tdDia = document.createElement('td');
+                tdDia.className = 'day-cell';
+                tdDia.innerHTML = `
+                    <button class="btn-plus" onclick="incrementar(this)">+</button>
+                    <span class="count-text" style="display: none;" onclick="incrementarDesdeNumero(this)">0</span>
+                `;
+                tr.appendChild(tdDia);
+            }
+            
+            // Total
+            const tdTotal = document.createElement('td');
+            tdTotal.className = 'total-cell';
+            tdTotal.innerText = '0';
+            tr.appendChild(tdTotal);
+            
+            cuerpoTabla.appendChild(tr);
+        }
+
+        function incrementar(btn) {
+            const cell = btn.parentNode;
+            const span = cell.querySelector('.count-text');
+            btn.style.display = 'none';
+            span.style.display = 'block';
+            sumarUno(span);
+        }
+
+        function incrementarDesdeNumero(span) {
+            sumarUno(span);
+        }
+
+        function sumarUno(span) {
+            let valor = parseInt(span.innerText);
+            valor++;
+            span.innerText = valor;
+            actualizarTotalFila(span.closest('tr'));
+        }
+
+        function actualizarTotalFila(row) {
+            const counts = row.querySelectorAll('.count-text');
+            const totalCell = row.querySelector('.total-cell');
+            let suma = 0;
+            counts.forEach(s => suma += parseInt(s.innerText));
+            totalCell.innerText = suma;
+        }
+
+        function limpiarTabla() {
+            if(confirm("¿Borrar todos los datos de la semana?")) {
+                document.querySelectorAll('.count-text').forEach(s => {
+                    s.innerText = '0';
+                    s.style.display = 'none';
+                });
+                document.querySelectorAll('.btn-plus').forEach(b => b.style.display = 'flex');
+                document.querySelectorAll('.total-cell').forEach(t => t.innerText = '0');
+                document.querySelectorAll('.name-input').forEach(n => n.value = '');
+            }
+        }
+    </script>
+</body>
+</html>

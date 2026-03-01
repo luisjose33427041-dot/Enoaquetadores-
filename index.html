@@ -48,7 +48,7 @@
         table {
             border-collapse: collapse;
             width: 100%;
-            min-width: 800px; /* Un poco más ancho para el nuevo botón */
+            min-width: 800px;
             height: 100%;
             table-layout: fixed;
         }
@@ -115,7 +115,6 @@
             cursor: pointer;
         }
 
-        /* Botón de reset individual */
         .btn-row-reset {
             background-color: #475569;
             color: white;
@@ -165,15 +164,31 @@
         const numFilas = 9;
         const cuerpoTabla = document.getElementById('cuerpoTabla');
 
+        // Función para guardar todo en LocalStorage
+        function guardarDatos() {
+            const filasData = [];
+            document.querySelectorAll('#cuerpoTabla tr').forEach(tr => {
+                const nombre = tr.querySelector('.name-input').value;
+                const counts = [];
+                tr.querySelectorAll('.count-text').forEach(span => {
+                    counts.push({
+                        valor: span.innerText,
+                        visible: span.style.display !== 'none'
+                    });
+                });
+                filasData.push({ nombre, counts });
+            });
+            localStorage.setItem('datosEmpaquetadores', JSON.stringify(filasData));
+        }
+
+        // Crear la tabla
         for (let i = 0; i < numFilas; i++) {
             const tr = document.createElement('tr');
             
-            // Nombre
             const tdNombre = document.createElement('td');
-            tdNombre.innerHTML = `<input type="text" class="name-input" placeholder="Empleado ${i+1}">`;
+            tdNombre.innerHTML = `<input type="text" class="name-input" placeholder="Empleado ${i+1}" oninput="guardarDatos()">`;
             tr.appendChild(tdNombre);
             
-            // Lunes a Domingo
             for (let j = 0; j < 7; j++) {
                 const tdDia = document.createElement('td');
                 tdDia.className = 'day-cell';
@@ -184,18 +199,40 @@
                 tr.appendChild(tdDia);
             }
             
-            // Total
             const tdTotal = document.createElement('td');
             tdTotal.className = 'total-cell';
             tdTotal.innerText = '0';
             tr.appendChild(tdTotal);
 
-            // Botón Reset Fila
             const tdAction = document.createElement('td');
             tdAction.innerHTML = `<button class="btn-row-reset" onclick="limpiarFila(this)">↺</button>`;
             tr.appendChild(tdAction);
             
             cuerpoTabla.appendChild(tr);
+        }
+
+        // Función para cargar datos al abrir
+        function cargarDatos() {
+            const storage = localStorage.getItem('datosEmpaquetadores');
+            if (!storage) return;
+            const data = JSON.parse(storage);
+            const trs = document.querySelectorAll('#cuerpoTabla tr');
+            
+            data.forEach((filaData, i) => {
+                if (trs[i]) {
+                    trs[i].querySelector('.name-input').value = filaData.nombre;
+                    const spans = trs[i].querySelectorAll('.count-text');
+                    const btns = trs[i].querySelectorAll('.btn-plus');
+                    filaData.counts.forEach((c, j) => {
+                        spans[j].innerText = c.valor;
+                        if (c.visible) {
+                            spans[j].style.display = 'block';
+                            btns[j].style.display = 'none';
+                        }
+                    });
+                    actualizarTotalFila(trs[i]);
+                }
+            });
         }
 
         function incrementar(btn) {
@@ -215,6 +252,7 @@
             valor++;
             span.innerText = valor;
             actualizarTotalFila(span.closest('tr'));
+            guardarDatos(); // Guardar al sumar
         }
 
         function actualizarTotalFila(row) {
@@ -233,14 +271,19 @@
             });
             row.querySelectorAll('.btn-plus').forEach(b => b.style.display = 'flex');
             row.querySelector('.total-cell').innerText = '0';
+            guardarDatos(); // Guardar al limpiar fila
         }
 
         function limpiarTabla() {
             if(confirm("¿Borrar todos los datos de la semana?")) {
                 document.querySelectorAll('.btn-row-reset').forEach(btn => limpiarFila(btn));
                 document.querySelectorAll('.name-input').forEach(n => n.value = '');
+                localStorage.removeItem('datosEmpaquetadores');
             }
         }
+
+        // Cargar al iniciar
+        window.onload = cargarDatos;
     </script>
 </body>
 </html>

@@ -40,7 +40,7 @@
             flex-grow: 1;
             width: 98%;
             height: 80%;
-            overflow-x: auto; /* Permite el deslizamiento horizontal si es necesario */
+            overflow-x: auto;
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
         }
@@ -48,7 +48,7 @@
         table {
             border-collapse: collapse;
             width: 100%;
-            min-width: 700px; /* Asegura que las columnas no se aplasten demasiado */
+            min-width: 800px; /* Un poco más ancho para el nuevo botón */
             height: 100%;
             table-layout: fixed;
         }
@@ -105,7 +105,7 @@
         }
 
         .count-text {
-            color: #fbbf24; /* Color naranja/amarillo para resaltar el número */
+            color: #fbbf24;
             font-weight: bold;
             font-size: 1rem;
             display: block;
@@ -114,6 +114,20 @@
             line-height: 40px;
             cursor: pointer;
         }
+
+        /* Botón de reset individual */
+        .btn-row-reset {
+            background-color: #475569;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 5px;
+            font-size: 0.7rem;
+            width: 90%;
+        }
+
+        .btn-row-reset:hover { background-color: #ef4444; }
 
         .btn-reset {
             background-color: var(--btn-red);
@@ -136,14 +150,9 @@
             <thead>
                 <tr>
                     <th style="width: 120px;">Nombre</th>
-                    <th>Lunes</th>
-                    <th>Martes</th>
-                    <th>Miércoles</th>
-                    <th>Jueves</th>
-                    <th>Viernes</th>
-                    <th>Sábado</th>
-                    <th>Domingo</th>
+                    <th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th>
                     <th style="width: 60px;">Total</th>
+                    <th style="width: 40px;">Reset</th>
                 </tr>
             </thead>
             <tbody id="cuerpoTabla"></tbody>
@@ -164,7 +173,7 @@
             tdNombre.innerHTML = `<input type="text" class="name-input" placeholder="Empleado ${i+1}">`;
             tr.appendChild(tdNombre);
             
-            // Lunes a Domingo (7 días)
+            // Lunes a Domingo
             for (let j = 0; j < 7; j++) {
                 const tdDia = document.createElement('td');
                 tdDia.className = 'day-cell';
@@ -180,6 +189,11 @@
             tdTotal.className = 'total-cell';
             tdTotal.innerText = '0';
             tr.appendChild(tdTotal);
+
+            // Botón Reset Fila
+            const tdAction = document.createElement('td');
+            tdAction.innerHTML = `<button class="btn-row-reset" onclick="limpiarFila(this)">↺</button>`;
+            tr.appendChild(tdAction);
             
             cuerpoTabla.appendChild(tr);
         }
@@ -211,14 +225,19 @@
             totalCell.innerText = suma;
         }
 
+        function limpiarFila(btn) {
+            const row = btn.closest('tr');
+            row.querySelectorAll('.count-text').forEach(s => {
+                s.innerText = '0';
+                s.style.display = 'none';
+            });
+            row.querySelectorAll('.btn-plus').forEach(b => b.style.display = 'flex');
+            row.querySelector('.total-cell').innerText = '0';
+        }
+
         function limpiarTabla() {
             if(confirm("¿Borrar todos los datos de la semana?")) {
-                document.querySelectorAll('.count-text').forEach(s => {
-                    s.innerText = '0';
-                    s.style.display = 'none';
-                });
-                document.querySelectorAll('.btn-plus').forEach(b => b.style.display = 'flex');
-                document.querySelectorAll('.total-cell').forEach(t => t.innerText = '0');
+                document.querySelectorAll('.btn-row-reset').forEach(btn => limpiarFila(btn));
                 document.querySelectorAll('.name-input').forEach(n => n.value = '');
             }
         }

@@ -3,287 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Empaquetadores</title>
+    <title>Control EMPAQUTADORES- Foco Total</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --bg: #1e293b;
-            --text: #f8fafc;
-            --border: #475569;
-            --cell-bg: #334155;
-            --btn-red: #ef4444;
+            --primary: #2c3e50;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --accent: #3498db;
+            --highlight: #e3f2fd; 
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
-            margin: 0;
-            height: 100vh;
-            overflow: hidden;
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 10px; margin: 0; }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 5px; }
+        .subtitle { text-align: center; font-size: 0.8em; color: #666; margin-bottom: 15px; }
+
+        .config-bar {
+            background: white; padding: 10px; border-radius: 8px;
+            margin-bottom: 15px; display: flex; flex-wrap: wrap;
+            gap: 10px; justify-content: center; align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        h2 { 
-            margin: 10px 0; 
-            color: var(--primary); 
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 0.9em; }
+        th { background-color: var(--primary); color: white; padding: 8px; white-space: nowrap; }
+        td { border: 1px solid #ddd; padding: 5px; text-align: center; transition: 0.2s; }
+
+        /* AHORA SÍ: Resalta todas las celdas de la fila */
+        .fila-resaltada td { 
+            background-color: var(--highlight) !important; 
         }
 
-        .table-container {
-            flex-grow: 1;
-            width: 98%;
-            height: 80%;
-            overflow-x: auto;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-        }
+        .col-nombre { display: flex; align-items: center; gap: 5px; justify-content: center; min-width: 130px; }
+        .btn-luz { cursor: pointer; font-size: 1.2em; user-select: none; padding: 2px; }
+        .input-nombre { border: none; width: 80px; font-weight: bold; outline: none; background: transparent; }
 
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            min-width: 800px;
-            height: 100%;
-            table-layout: fixed;
-        }
+        .dia-celda { cursor: pointer; min-width: 60px; user-select: none; background: white; }
+        .presente { background-color: var(--success) !important; color: white; }
 
-        th, td {
-            border: 1px solid var(--border);
-            text-align: center;
-            font-size: 0.75rem;
-        }
+        .controles { display: flex; justify-content: center; gap: 4px; margin-top: 4px; }
+        .btn-sm { border: none; border-radius: 3px; padding: 4px 10px; cursor: pointer; font-weight: bold; }
+        .btn-plus { background: #d4edda; color: #155724; }
+        .btn-minus { background: #f8d7da; color: #721c24; }
+        .btn-reset { background: var(--danger); color: white; border: none; padding: 5px; border-radius: 4px; cursor: pointer; font-size: 10px; }
 
-        th {
-            background-color: var(--primary);
-            color: white;
-            padding: 8px 2px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
+        .bandejas-count { font-weight: bold; display: block; font-size: 1.1em; }
+        .total-ingreso { font-weight: bold; color: var(--success); }
 
-        td {
-            padding: 2px;
-            background-color: #243147;
-        }
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 20% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 300px; }
+        .modal-content input { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc; }
 
-        .name-input {
-            text-align: left;
-            padding: 5px;
-            font-weight: bold;
-            color: #fff;
-            width: 100%;
-            background: transparent;
-            border: none;
-            outline: none;
-        }
-
-        .total-cell {
-            font-weight: bold;
-            color: #60a5fa;
-            font-size: 0.9rem;
-            background-color: #1e293b;
-        }
-
-        .btn-plus {
-            background-color: transparent;
-            color: var(--text);
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            height: 100%;
-            min-height: 40px;
-            font-size: 1.2rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .count-text {
-            color: #fbbf24;
-            font-weight: bold;
-            font-size: 1rem;
-            display: block;
-            width: 100%;
-            height: 100%;
-            line-height: 40px;
-            cursor: pointer;
-        }
-
-        .btn-row-reset {
-            background-color: #475569;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            padding: 5px;
-            font-size: 0.7rem;
-            width: 90%;
-        }
-
-        .btn-row-reset:hover { background-color: #ef4444; }
-
-        .btn-reset {
-            background-color: var(--btn-red);
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            margin: 15px 0;
-        }
+        @media print { .config-bar, .controles, .btn-reset, .btn-luz { display: none; } }
     </style>
 </head>
 <body>
 
-    <h2>📦 Registro de Empaquetadores</h2>
+    <h2>Control EMPAQUETADORES</h2>
+    <p class="subtitle">💡 Toca el bombillo para resaltar la fila entera</p>
+
+    <div class="config-bar">
+        <label><strong>Precio $:</strong> </label>
+        <input type="number" id="precioBandeja" value="0.46" step="0.01" style="width: 70px;" oninput="guardarYCalcular()">
+        <button onclick="window.print()">Imprimir</button>
+    </div>
 
     <div class="table-container">
         <table>
             <thead>
                 <tr>
-                    <th style="width: 120px;">Nombre</th>
+                    <th>Trabajador</th>
                     <th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th>
-                    <th style="width: 60px;">Total</th>
-                    <th style="width: 40px;">Reset</th>
+                    <th>Total $</th>
+                    <th>Borrar</th>
                 </tr>
             </thead>
             <tbody id="cuerpoTabla"></tbody>
         </table>
     </div>
 
-    <button class="btn-reset" onclick="limpiarTabla()">Limpiar Todo</button>
+    <div id="modalPago" class="modal">
+        <div class="modal-content">
+            <h3>Datos de Pago</h3>
+            <input type="text" id="modalCedula" placeholder="Cédula">
+            <input type="text" id="modalBanco" placeholder="Banco">
+            <input type="text" id="modalTlf" placeholder="Teléfono">
+            <button onclick="guardarDatosPago()" style="background: var(--success); color: white; border: none; padding: 10px; width: 100%; margin-top: 10px;">Guardar</button>
+            <button onclick="cerrarModal()" style="background: #ccc; border: none; padding: 5px; width: 100%; margin-top: 5px;">Cerrar</button>
+        </div>
+    </div>
 
     <script>
-        const numFilas = 9;
         const cuerpoTabla = document.getElementById('cuerpoTabla');
+        const precioInput = document.getElementById('precioBandeja');
+        let filaActual = null;
 
-        // Función para guardar todo en LocalStorage
-        function guardarDatos() {
-            const filasData = [];
-            document.querySelectorAll('#cuerpoTabla tr').forEach(tr => {
-                const nombre = tr.querySelector('.name-input').value;
-                const counts = [];
-                tr.querySelectorAll('.count-text').forEach(span => {
-                    counts.push({
-                        valor: span.innerText,
-                        visible: span.style.display !== 'none'
-                    });
+        window.onload = function() {
+            const datosGuardados = JSON.parse(localStorage.getItem('mikarol_data')) || {};
+            if(datosGuardados.precio) precioInput.value = datosGuardados.precio;
+            for (let i = 1; i <= 20; i++) { crearFila(i, datosGuardados[`fila_${i}`]); }
+            calcularTodo();
+        };
+
+        function crearFila(id, datos = null) {
+            const fila = document.createElement('tr');
+            fila.id = `fila_${id}`;
+            const d = datos || { nombre: '', dias: [0,0,0,0,0,0,0], asistencias: [false,false,false,false,false,false,false], pago: {c:'', b:'', t:''} };
+            fila.dataset.pago = JSON.stringify(d.pago);
+
+            let html = `
+                <td>
+                    <div class="col-nombre">
+                        <span class="btn-luz" onclick="resaltarFila(this.closest('tr'))">💡</span>
+                        <input type="text" class="input-nombre" value="${d.nombre}" placeholder="Emp ${id}" 
+                        oninput="guardarYCalcular()" ondblclick="abrirModal(${id})">
+                    </div>
+                </td>`;
+            
+            for (let i = 0; i < 7; i++) {
+                html += `
+                    <td class="dia-celda ${d.asistencias[i] ? 'presente' : ''}" ondblclick="toggleAsistencia(this)">
+                        <span class="bandejas-count">${d.dias[i]}</span>
+                        <div class="controles">
+                            <button class="btn-sm btn-minus" onclick="cambiarBandejas(this, -1)">-</button>
+                            <button class="btn-sm btn-plus" onclick="cambiarBandejas(this, 1)">+</button>
+                        </div>
+                    </td>`;
+            }
+            html += `<td class="total-ingreso">$0.00</td>
+                     <td><button class="btn-reset" ondblclick="reiniciarFila(${id})">Limpiar</button></td>`;
+            fila.innerHTML = html;
+            cuerpoTabla.appendChild(fila);
+        }
+
+        function resaltarFila(fila) {
+            const yaResaltada = fila.classList.contains('fila-resaltada');
+            // Quitamos el resaltado de cualquier otra fila antes
+            cuerpoTabla.querySelectorAll('tr').forEach(tr => tr.classList.remove('fila-resaltada'));
+            // Si no estaba resaltada, la resaltamos
+            if (!yaResaltada) {
+                fila.classList.add('fila-resaltada');
+            }
+        }
+
+        function cambiarBandejas(boton, valor) {
+            event.stopPropagation();
+            const fila = boton.closest('tr');
+            const span = boton.closest('.dia-celda').querySelector('.bandejas-count');
+            span.innerText = Math.max(0, parseInt(span.innerText) + valor);
+            
+            // Se apaga el resaltado de toda la fila al terminar
+            fila.classList.remove('fila-resaltada');
+            
+            guardarYCalcular();
+        }
+
+        function toggleAsistencia(celda) {
+            celda.classList.toggle('presente');
+            guardarYCalcular();
+        }
+
+        function guardarYCalcular() {
+            const dataToSave = { precio: precioInput.value };
+            const precio = parseFloat(precioInput.value) || 0;
+
+            cuerpoTabla.querySelectorAll('tr').forEach(fila => {
+                const id = fila.id;
+                const celdas = fila.querySelectorAll('.dia-celda');
+                const rowData = {
+                    nombre: fila.querySelector('.input-nombre').value,
+                    pago: JSON.parse(fila.dataset.pago),
+                    dias: [], asistencias: []
+                };
+
+                let totalB = 0;
+                celdas.forEach(celda => {
+                    const cant = parseInt(celda.querySelector('.bandejas-count').innerText);
+                    rowData.dias.push(cant);
+                    rowData.asistencias.push(celda.classList.contains('presente'));
+                    totalB += cant;
                 });
-                filasData.push({ nombre, counts });
+                fila.querySelector('.total-ingreso').innerText = "$" + (totalB * precio).toFixed(2);
+                dataToSave[id] = rowData;
             });
-            localStorage.setItem('datosEmpaquetadores', JSON.stringify(filasData));
+            localStorage.setItem('mikarol_data', JSON.stringify(dataToSave));
         }
 
-        // Crear la tabla
-        for (let i = 0; i < numFilas; i++) {
-            const tr = document.createElement('tr');
-            
-            const tdNombre = document.createElement('td');
-            tdNombre.innerHTML = `<input type="text" class="name-input" placeholder="Empleado ${i+1}" oninput="guardarDatos()">`;
-            tr.appendChild(tdNombre);
-            
-            for (let j = 0; j < 7; j++) {
-                const tdDia = document.createElement('td');
-                tdDia.className = 'day-cell';
-                tdDia.innerHTML = `
-                    <button class="btn-plus" onclick="incrementar(this)">+</button>
-                    <span class="count-text" style="display: none;" onclick="incrementarDesdeNumero(this)">0</span>
-                `;
-                tr.appendChild(tdDia);
-            }
-            
-            const tdTotal = document.createElement('td');
-            tdTotal.className = 'total-cell';
-            tdTotal.innerText = '0';
-            tr.appendChild(tdTotal);
-
-            const tdAction = document.createElement('td');
-            tdAction.innerHTML = `<button class="btn-row-reset" onclick="limpiarFila(this)">↺</button>`;
-            tr.appendChild(tdAction);
-            
-            cuerpoTabla.appendChild(tr);
+        function abrirModal(id) {
+            filaActual = document.getElementById(`fila_${id}`);
+            const info = JSON.parse(filaActual.dataset.pago);
+            document.getElementById('modalCedula').value = info.c;
+            document.getElementById('modalBanco').value = info.b;
+            document.getElementById('modalTlf').value = info.t;
+            document.getElementById('modalPago').style.display = 'block';
         }
 
-        // Función para cargar datos al abrir
-        function cargarDatos() {
-            const storage = localStorage.getItem('datosEmpaquetadores');
-            if (!storage) return;
-            const data = JSON.parse(storage);
-            const trs = document.querySelectorAll('#cuerpoTabla tr');
-            
-            data.forEach((filaData, i) => {
-                if (trs[i]) {
-                    trs[i].querySelector('.name-input').value = filaData.nombre;
-                    const spans = trs[i].querySelectorAll('.count-text');
-                    const btns = trs[i].querySelectorAll('.btn-plus');
-                    filaData.counts.forEach((c, j) => {
-                        spans[j].innerText = c.valor;
-                        if (c.visible) {
-                            spans[j].style.display = 'block';
-                            btns[j].style.display = 'none';
-                        }
-                    });
-                    actualizarTotalFila(trs[i]);
-                }
+        function guardarDatosPago() {
+            filaActual.dataset.pago = JSON.stringify({
+                c: document.getElementById('modalCedula').value,
+                b: document.getElementById('modalBanco').value,
+                t: document.getElementById('modalTlf').value
             });
+            cerrarModal();
+            guardarYCalcular();
         }
 
-        function incrementar(btn) {
-            const cell = btn.parentNode;
-            const span = cell.querySelector('.count-text');
-            btn.style.display = 'none';
-            span.style.display = 'block';
-            sumarUno(span);
-        }
+        function cerrarModal() { document.getElementById('modalPago').style.display = 'none'; }
 
-        function incrementarDesdeNumero(span) {
-            sumarUno(span);
-        }
-
-        function sumarUno(span) {
-            let valor = parseInt(span.innerText);
-            valor++;
-            span.innerText = valor;
-            actualizarTotalFila(span.closest('tr'));
-            guardarDatos(); // Guardar al sumar
-        }
-
-        function actualizarTotalFila(row) {
-            const counts = row.querySelectorAll('.count-text');
-            const totalCell = row.querySelector('.total-cell');
-            let suma = 0;
-            counts.forEach(s => suma += parseInt(s.innerText));
-            totalCell.innerText = suma;
-        }
-
-        function limpiarFila(btn) {
-            const row = btn.closest('tr');
-            row.querySelectorAll('.count-text').forEach(s => {
-                s.innerText = '0';
-                s.style.display = 'none';
+        function reiniciarFila(id) {
+            const fila = document.getElementById(`fila_${id}`);
+            fila.querySelectorAll('.dia-celda').forEach(celda => {
+                celda.classList.remove('presente');
+                celda.querySelector('.bandejas-count').innerText = "0";
             });
-            row.querySelectorAll('.btn-plus').forEach(b => b.style.display = 'flex');
-            row.querySelector('.total-cell').innerText = '0';
-            guardarDatos(); // Guardar al limpiar fila
+            guardarYCalcular();
         }
 
-        function limpiarTabla() {
-            if(confirm("¿Borrar todos los datos de la semana?")) {
-                document.querySelectorAll('.btn-row-reset').forEach(btn => limpiarFila(btn));
-                document.querySelectorAll('.name-input').forEach(n => n.value = '');
-                localStorage.removeItem('datosEmpaquetadores');
-            }
-        }
-
-        // Cargar al iniciar
-        window.onload = cargarDatos;
+        function calcularTodo() { guardarYCalcular(); }
     </script>
 </body>
 </html>
